@@ -1,0 +1,5 @@
+ipdb
+requests==2.21.0
+gunicorn==19.9.0
+paho-mqtt
+pillow==10.1.0
