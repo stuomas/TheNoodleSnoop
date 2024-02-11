@@ -79,15 +79,14 @@ class AsyncMqttClient:
 
         try:
             while True:
-                try:
-                    payload = detection_utils.get_detections()
-                    self.client.publish(MQTT_REPORT_TOPIC, json.dumps(payload), qos=0)
-                    self.client.publish(MQTT_OVERLAY_TOPIC, json.dumps(payload['overlay']), qos=0)
-                except Exception as ex:
-                    print("Exception: ", ex)
+                payload = detection_utils.get_detections()
+                self.client.publish(MQTT_REPORT_TOPIC, json.dumps(payload), qos=0)
+                self.client.publish(MQTT_OVERLAY_TOPIC, json.dumps(payload['overlay']), qos=0)
                 await asyncio.sleep(SNOOPING_INTERVAL_SEC)
         except KeyboardInterrupt:
-            print('interrupted!')
+            print('Interrupted by user, exiting')
+        except Exception as ex:
+            print("Exception: ", ex)
 
         self.client.disconnect()
 
