@@ -52,7 +52,10 @@ def get_detections():
 
     detections = detect(net_main, img, thresh=THRESH)
     detections_to_visualize = [d for d in detections if d[1] > VISUALIZATION_THRESH]
-    overlay_detections(Image.open(io.BytesIO(img_data)), detections_to_visualize)
+    buffer = io.BytesIO(img_data)
+    overlay_img = Image.open(buffer)
+    overlay_detections(overlay_img, detections_to_visualize)
+    overlay_img.save(buffer, format='JPEG')
 
     global prediction
     current_confidence_sum = sum_p_in_detections(detections)
@@ -66,8 +69,8 @@ def get_detections():
     return {
         'failing': is_failing(prediction),
         'raw_detections': detections,
-        'raw_predictions':  prediction,
-        'overlay': base64.b64encode(img_data).decode(),
+        'raw_predictions': prediction,
+        'overlay': base64.b64encode(buffer.getvalue()).decode(),
         'timestamp': time.time()
     }
 
@@ -79,7 +82,6 @@ def overlay_detections(img, detections):
         (x1, y1), (x2, y2) = (xc - w // 2, yc - h // 2), (xc + w // 2, yc + w // 2)
         points = (x1, y1), (x2, y1), (x2, y2), (x1, y2), (x1, y1)
         draw.line(points, fill=(0, 255, 0, 255), width=3)
-    return img
 
 
 def is_failing(pred):
